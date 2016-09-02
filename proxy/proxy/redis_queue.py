@@ -23,7 +23,7 @@ class RedisQueue(object):
         self.poped_name = self.POPED_FMT % (name)
         self.pushed_name = self.PUSHED_FMT % (name)
         pool = redis.ConnectionPool(host=self.HOST, port=self.PORT, db=self.DB)
-        self.conn = redis.Redis(pool)
+        self.conn = redis.Redis(connection_=pool)
 
     def push(self, ip):
         """Push a ip to queue, check duplicate
