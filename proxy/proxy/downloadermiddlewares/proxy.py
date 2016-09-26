@@ -29,7 +29,7 @@ class ProxyMiddleware(HttpProxyMiddleware):
     def process_request(self, request, spider):
         """record this page
         """
-        proxy = random.choice(self.proxy_list)
-        if proxy:
+        if self.proxy_list:
+            proxy = random.choice(self.proxy_list)
             request.meta['proxy'] = 'http://%s' % (proxy)
             logging.debug('use proxy %s' % (proxy))

@@ -87,3 +87,9 @@ ENV/
 
 # Rope project settings
 .ropeproject
+
+# redis data file
+*.rdb
+
+*.pid
+*.csv

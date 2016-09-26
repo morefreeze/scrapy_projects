@@ -1,5 +1,6 @@
 # coding: utf-8
 import redis
+import logging
 
 
 class RedisPool(object):
@@ -10,5 +11,9 @@ class RedisPool(object):
         :returns: a valid connection
 
         """
-        pool = redis.ConnectionPool(host=redis_host, port=redis_port, db=redis_db)
-        return redis.Redis(connection_pool=pool)
+        try:
+            pool = redis.ConnectionPool(host=redis_host, port=redis_port, db=redis_db)
+            return redis.Redis(connection_pool=pool)
+        except Exception as e:
+            logging.error('connection redis error[%s]' % (e))
+            raise
