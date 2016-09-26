@@ -25,7 +25,7 @@ class AmazonSpider(scrapy.Spider):
             if item['title'] == '':
                 continue
             item['author'] = safe_list_get(li.xpath('.//div[@class="a-row a-spacing-none"]/span/text()').extract(), 0, 'Unknown')
-            item['price'] = li.xpath('.//span[contains(@class, "s-price")]/text()').extract()
+            item['price'] = li.xpath('.//span[contains(@class, "s-price")]/text()').extract()[-1]
             item['rating'] = float(safe_list_get(li.xpath('.//i[contains(@class, "a-icon-star")]/span/text()').re('[\d\.]+'), 0, 0.0))
             item['rating_num'] = int(safe_list_get(li.xpath('.//a[contains(@class, "a-size-small")]/text()').re('\d+'), 0, 0))
             yield item
