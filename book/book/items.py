@@ -15,3 +15,5 @@ class BookItem(scrapy.Item):
     price = scrapy.Field()
     rating = scrapy.Field()
     rating_num = scrapy.Field()
+    url = scrapy.Field()
+    category = scrapy.Field()
