@@ -10,6 +10,8 @@ def safe_list_get(l, idx, default=''):
 class AmazonSpider(scrapy.Spider):
     name = "amazon"
     allowed_domains = ["amazon.cn"]
+    cat = None
+    start_url = None
     start_urls = {
         '文学': 'https://www.amazon.cn/s/?node=1841471071&ie=UTF8',
         '经管': 'https://www.amazon.cn/s/?node=1841478071&ie=UTF8',
@@ -20,7 +22,18 @@ class AmazonSpider(scrapy.Spider):
         '生活': 'https://www.amazon.cn/s/?node=1844552071&ie=UTF8',
     }
 
+    def __init__(self, cat=None, url=None):
+        if cat and url:
+            self.cat = cat
+            self.start_url = url
+
     def start_requests(self):
+        if self.cat and self.start_url:
+            return [scrapy.Request(
+                self.start_url,
+                meta={'category': self.cat},
+                callback=self.parse_book_follow_next_page
+            )]
         return [scrapy.Request(
             url,
             meta={'category': cat},
