@@ -33,7 +33,7 @@ class IP84Spider(scrapy.Spider):
         # debug
         # from scrapy.shell import inspect_response
         # inspect_response(response, self)
-        for i in range(1, 10):
+        for i in range(1, 2):
             yield scrapy.Request(response.request.url + '/%s' % (i), callback=self.parse_ip)
 
     def parse_ip(self, response):

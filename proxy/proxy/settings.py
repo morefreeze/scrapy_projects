@@ -1,5 +1,6 @@
 BOT_NAME = 'proxySpider'
 DOWNLOAD_DELAY = 0.25
+DOWNLOAD_TIMEOUT = 7
 
 DOWNLOADER_MIDDLEWARES = {
     'proxy.downloadermiddlewares.proxy.ProxyMiddleware': 200,

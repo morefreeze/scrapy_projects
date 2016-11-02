@@ -38,8 +38,12 @@ class KDLSpider(scrapy.Spider):
         # debug
         # from scrapy.shell import inspect_response
         # inspect_response(response, self)
-        for i in range(1, 10):
-            yield scrapy.Request(response.request.url + '%s' % (i), self.parse_ip)
+        for i in range(1, 2):
+            yield scrapy.Request(
+                response.request.url + '%s' % (i),
+                self.parse_ip,
+                dont_filter=True,
+            )
 
     def parse_ip(self, response):
         """parse ip

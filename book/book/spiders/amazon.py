@@ -13,13 +13,11 @@ class AmazonSpider(scrapy.Spider):
     cat = None
     start_url = None
     start_urls = {
-        '文学': 'https://www.amazon.cn/s/?node=1841471071&ie=UTF8',
-        '经管': 'https://www.amazon.cn/s/?node=1841478071&ie=UTF8',
-        '社科': 'https://www.amazon.cn/s/?node=1841479071&ie=UTF8',
-        '科技': 'https://www.amazon.cn/s/?node=1841480071&ie=UTF8',
-        '少儿': 'https://www.amazon.cn/s/?node=1841481071&ie=UTF8',
-        '教育': 'https://www.amazon.cn/s/?node=1844551071&ie=UTF8',
-        '生活': 'https://www.amazon.cn/s/?node=1844552071&ie=UTF8',
+        '文学巨匠': 'https://www.amazon.cn/s/?node=1851470071&ie=UTF8',
+        '外国文学': 'https://www.amazon.cn/s/?node=1851471071&ie=UTF8',
+        '秋乏冬眠': 'https://www.amazon.cn/s/?node=1851472071&ie=UTF8',
+        '文艺青年': 'https://www.amazon.cn/s/?node=1851473071&ie=UTF8',
+        '诺贝尔奖': 'https://www.amazon.cn/s/?node=1851474071&ie=UTF8',
     }
 
     def __init__(self, cat=None, url=None):

@@ -29,7 +29,8 @@ class ProxyMiddleware(HttpProxyMiddleware):
     def process_request(self, request, spider):
         """record this page
         """
-        if self.proxy_list:
+        if 'no_proxy' in request.meta and self.proxy_list:
             proxy = random.choice(self.proxy_list)
             request.meta['proxy'] = 'http://%s' % (proxy)
             logging.debug('use proxy %s' % (proxy))
+        request.meta['no_proxy'] = True
