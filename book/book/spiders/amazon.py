@@ -20,10 +20,13 @@ class AmazonSpider(scrapy.Spider):
         '诺贝尔奖': 'https://www.amazon.cn/s/?node=1851474071&ie=UTF8',
     }
 
-    def __init__(self, cat=None, url=None):
-        if cat and url:
+    def __init__(self, cat=None, url=None, node=None):
+        if cat and (node or url):
             self.cat = cat
-            self.start_url = url
+            if url:
+                self.start_url = url
+            else:
+                self.start_url = 'https://www.amazon.cn/s/?node=%s&ie=UTF8' % (node)
 
     def start_requests(self):
         if self.cat and self.start_url:
