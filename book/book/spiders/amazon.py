@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import scrapy
-from items import BookItem
+from book.items import BookItem
 
 
 def safe_list_get(l, idx, default=''):
