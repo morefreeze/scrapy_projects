@@ -93,3 +93,5 @@ ENV/
 
 *.pid
 *.csv
+*.numbers
+*.xlsx
