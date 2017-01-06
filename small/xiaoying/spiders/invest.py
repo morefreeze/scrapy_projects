@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import scrapy
+import json
 
 
 def safe_list_get(l, idx, default=''):
