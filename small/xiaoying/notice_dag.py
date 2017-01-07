@@ -1,5 +1,5 @@
 # coding: utf-8
-from os import sys, path, environ, remove
+from os import path, environ
 from airflow import DAG
 from airflow.operators import BashOperator, BranchPythonOperator, PythonOperator, SlackAPIPostOperator
 from utils import period2timedelta, money2float
@@ -7,6 +7,12 @@ from filter import Filter
 import datetime
 import pandas as pd
 
+
+def need_run(ti, execution_date, **kwargs):
+    long_time = datetime.timedelta(seconds=60*10)
+    if ti.start_date and execution_date and ti.start_date - execution_date < long_time:
+        return 'run_spider'
+    return ''
 
 slack_txt_file = 'txt_for_slack'
 csv_file = 'xy.csv'
@@ -68,11 +74,18 @@ default_args = {
     'retry_delay': datetime.timedelta(minutes=5),
     'queue': 'bash_queue',
     'provide_context': True,
+    'retry_exponential_backoff': True,
     # 'end_date': datetime.datetime(2017, 1, 1),
 }
 
 dag = DAG('xiaoying', default_args=default_args, schedule_interval='*/5 8-22 * * *')
 
+
+only_run_now = BranchPythonOperator(
+    task_id='only_run_now',
+    python_callable=need_run,
+    dag=dag
+)
 run_spider = BashOperator(
     task_id='run_spider',
     bash_command='cd {dir} && rm -f {csv_file} && scrapy runspider spiders/invest.py -t csv -o {csv_file}'.format(dir=dir, csv_file=csv_file),
@@ -104,8 +117,8 @@ post_slack = SlackAPIPostOperator(
     token=slack_token,
     channel='#xiaoying',
     username='airflow',
-    text='{{ ds }}\n' + txt,
+    text='{{ execution_date }}\n' + txt,
     dag=dag
 )
 
-run_spider >> filter_data >> need_slack >> post_slack
+only_run_now >> run_spider >> filter_data >> need_slack >> post_slack
