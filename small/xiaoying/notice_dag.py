@@ -43,8 +43,7 @@ def need_slack(ti, **kwargs):
         os.remove(slack_txt_file)
     except:
         pass
-    if len(candidate) > 0:
-        print candidate
+    if candidate and len(candidate) > 0:
         with open(slack_txt_file, 'w') as f:
             for can in candidate:
                 f.write('%s(%s) money: %s period: %s days benefit: %s%%\n' % (
