@@ -10,12 +10,13 @@ import pandas as pd
 
 slack_txt_file = 'txt_for_slack'
 csv_file = 'xy.csv'
+dir = path.abspath(path.dirname(__file__))
 def filter_data(csv_file, start_day=28, end_day=90, interest=780, state=None, **kwargs):
     f = pd.read_csv(csv_file)
     f['sub_title'] = f['sub_title'].fillna('')
     candidate = []
     filter = Filter()
-    filter.install_rule(lambda v: v['period'] < datetime.timedelta(days=20), ok_stop=True, weight=5)
+    filter.install_rule(lambda v: v['period'] <= datetime.timedelta(days=20), ok_stop=True, weight=5)
     filter.install_rule(lambda v: v['benefit'] >= 8 and v['period'] < datetime.timedelta(days=230))
     filter.install_rule(lambda v: not v['sub_title'].startswith('新手专享'))
     for row in f.iterrows():
@@ -75,7 +76,7 @@ dag = DAG('xiaoying', default_args=default_args, schedule_interval='*/5 8-22 * *
 
 run_spider = BashOperator(
     task_id='run_spider',
-    bash_command='cd /Users/freeze/scrapy_projects/small/small/ && rm -f {csv_file} && scrapy runspider spiders/invest.py -t csv -o {csv_file}'.format(csv_file=csv_file),
+    bash_command='cd {dir} && rm -f {csv_file} && scrapy runspider spiders/invest.py -t csv -o {csv_file}'.format(dir=dir, csv_file=csv_file),
     dag=dag
 )
 
