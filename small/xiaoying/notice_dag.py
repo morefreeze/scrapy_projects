@@ -55,7 +55,7 @@ def need_slack(ti, **kwargs):
                 can['period'].days,
                 can['benefit'],
             ))
-        ti.xcom_push(slack_message_key, s.getvalue())
+        ti.xcom_push(slack_message_key, s.getvalue().decode('utf-8'))
         return 'post_slack'
     return ''
 
@@ -103,7 +103,9 @@ need_slack = BranchPythonOperator(
 )
 
 slack_token = environ.get('SLACK_TOKEN')
-txt = '''{{ task_instance.xcom_pull(task_ids='need_slack', key='%s').decode('utf-8') }}''' % (slack_message_key)
+txt = '''{{ task_instance.xcom_pull(task_ids='need_slack', key='%s') }}''' % (slack_message_key)
+if txt is None:
+    txt = 'Nothing to read'
 post_slack = SlackAPIPostOperator(
     task_id='post_slack',
     token=slack_token,

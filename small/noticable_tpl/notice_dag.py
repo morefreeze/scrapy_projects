@@ -1,5 +1,6 @@
 # coding: utf-8
 from os import path, environ
+from StringIO import StringIO
 from airflow import DAG
 from airflow.operators import BashOperator, BranchPythonOperator, PythonOperator, SlackAPIPostOperator
 from utils import period2timedelta, money2float
@@ -9,7 +10,7 @@ import pandas as pd
 
 
 # This store text that will sent by slack
-slack_txt_file = 'txt_for_slack'
+slack_message_key = 'slack_message'
 # This store data file which maybe checked
 csv_file = 'xy.csv'
 dir = path.abspath(path.dirname(__file__))
@@ -46,11 +47,12 @@ def need_slack(ti, **kwargs):
     except:
         pass
     if candidate and len(candidate) > 0:
-        with open(slack_txt_file, 'w') as f:
-            for can in candidate:
-                f.write('%s\n' % (
-                    can['title'],
-                ))
+        s = StringIO()
+        for can in candidate:
+            s.write('%s\n' % (
+                can['title'],
+            ))
+        ti.xcom_push(slack_message_key, s.getvalue().decode('utf-8'))
         return 'post_slack'
     return ''
 
@@ -97,13 +99,10 @@ need_slack = BranchPythonOperator(
     dag=dag
 )
 
-slack_token = environ.get('SLACK_ME_TOKEN')
-try:
-    with open(slack_txt_file, 'r') as f:
-        txt = ''.join(f.readlines())
-        txt = txt.decode('utf-8')
-except:
-    txt = 'Nothing to read.'
+slack_token = environ.get('SLACK_TOKEN')
+txt = '''{{ task_instance.xcom_pull(task_ids='need_slack', key='%s') }}''' % (slack_message_key)
+if txt is None:
+    txt = 'Nothing to read'
 post_slack = SlackAPIPostOperator(
     task_id='post_slack',
     token=slack_token,
