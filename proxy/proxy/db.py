@@ -1,6 +1,7 @@
 # coding: utf-8
 import redis
 import logging
+import settings
 
 
 class RedisPool(object):
@@ -17,3 +18,6 @@ class RedisPool(object):
         except Exception as e:
             logging.error('connection redis error[%s]' % (e))
             raise
+
+def build_key(keys, sep=settings.REDIS_SEP):
+    return sep.join(keys)

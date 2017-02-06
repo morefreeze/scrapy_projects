@@ -9,9 +9,8 @@ import re
 import scrapy
 import redis
 
-from pipelines import NormalIPPipeline
 
-
+# This site seems contains harmful program.
 class IP84Spider(scrapy.Spider):
     name = 'ip_spider'
     IP_REGEX = re.compile('\\b(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}\

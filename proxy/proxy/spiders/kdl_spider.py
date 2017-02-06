@@ -9,8 +9,6 @@ import re
 import scrapy
 import redis
 
-from pipelines import NormalIPPipeline
-
 
 class KDLSpider(scrapy.Spider):
     name = 'kuaidaili_spider'

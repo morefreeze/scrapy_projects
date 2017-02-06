@@ -2,9 +2,10 @@
 import csv
 import sys
 import datetime
-from tqdm import tqdm
 import urllib
 import urllib2
+import gevent
+from gevent.local import local
 
 
 def test_url(opener, url):
@@ -16,12 +17,12 @@ def test_url(opener, url):
         print e
     return False
 
+stash = local()
+stash.gfw_succ = False
+stash.normal_succ = False
 candidate_proxies = [
-    # 'http://110.84.128.143:3128',
-    # 'http://39.163.54.101:80',
-    # 'http://175.17.14.5:8888',
-    'http://89.19.193.1:3128',
-    'http://166.62.86.208:80',
+    '103.4.167.230:8080',
+    '220.113.26.18:8080',
 ]
 gfw_urls = [
     'http://google.com',
@@ -38,21 +39,27 @@ normal_urls = [
     'http://www.acfun.tv',
 ]
 TIMEOUT = 3
+def gfw_func(opener, url):
+    if test_url(opener, url):
+        stash.gfw_succ = True
+
+def normal_func(opener, url):
+    if test_url(opener, url):
+        stash.normal_succ = True
+
 for proxy in candidate_proxies:
     print "Trying HTTP proxy %s" % proxy
     ph = urllib2.ProxyHandler({'http': proxy})
     opener = urllib2.build_opener(ph)
-    gfw_succ = False
-    succ = False
-    for url in tqdm(gfw_urls):
-        if test_url(opener, url):
-            gfw_succ = True
-            break
-    for url in tqdm(normal_urls):
-        if test_url(opener, url):
-            succ = True
-            break
-    if gfw_succ:
+    threads = []
+    for url in gfw_urls:
+        threads.append(gevent.spawn(gfw_func, opener, url))
+    gevent.joinall(threads)
+    threads = []
+    for url in normal_urls:
+        threads.append(gevent.spawn(normal_func, opener, url))
+    gevent.joinall(threads)
+    if stash.gfw_succ:
         print '%s is good for gfw' % (proxy)
-    if succ:
+    if stash.normal_succ:
         print '%s is good' % (proxy)
