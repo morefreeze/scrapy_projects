@@ -1,3 +1,6 @@
+import datetime
+
+
 BOT_NAME = 'proxySpider'
 DOWNLOAD_DELAY = 0.25
 DOWNLOAD_TIMEOUT = 7
@@ -9,7 +12,7 @@ DOWNLOADER_MIDDLEWARES = {
     'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': None,
     'random_useragent.RandomUserAgentMiddleware': 400
 }
-USER_AGENT_LIST = "useragents.txt"
+USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36"
 
 ITEM_PIPELINES = {
     'proxy.pipelines.DuplicatesPipeline': 300,
@@ -25,4 +28,4 @@ NORMAL_S = 'normal'
 GFW_S = 'gfw'
 HOST_S = 'host'
 EXPIRE_PRE = 'expire'
-EXPIRE_SECONDS = 60*60*3
+EXPIRE_DELTA = datetime.timedelta(seconds=60*60*3)

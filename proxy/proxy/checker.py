@@ -1,15 +1,34 @@
 # coding: utf-8
 import urllib
 import urllib2
+import json
 import logging
 import settings
 import time
+import datetime
 import threading
 import signal
 import sys
 import gevent
 from gevent.lock import Semaphore
 from db import RedisPool, build_key
+
+def _datetime(d):
+    if isinstance(d, datetime.datetime):
+        return d
+    if isinstance(d, datetime.date):
+        return datetime.datetime(d.year, d.month, d.day)
+    try:
+        n = datetime.datetime.strptime(d, '%Y-%m-%d %H:%M:%S')
+    except ValueError:
+        try:
+            n = datetime.datetime.strptime(d, "%Y-%m-%d %H:%M:%S.%f")
+        except ValueError:
+            try:
+                n = datetime.datetime.strptime(d, "%Y-%m-%d")
+            except ValueError:
+                n = datetime.datetime.strptime(d, "%Y-%m-%d %H:%M")
+    return n
 
 lock = Semaphore()
 class ProxyChecker(object):
@@ -35,6 +54,7 @@ class ProxyChecker(object):
         """
         try:
             resp = self.opener.open(url, timeout=self.TIMEOUT)
+            logging.debug(resp)
             if resp and resp.code == 200:
                 succ = True
         except Exception as e:
@@ -43,10 +63,24 @@ class ProxyChecker(object):
         # TODO: return lag
         return {'succ': succ}
 
+    """Check proxy normal throught httpbin.org/ip """
+    def check_httpbin(self):
+        url = 'http://httpbin.org/ip'
+        try:
+            resp = self.opener.open(url, timeout=self.TIMEOUT)
+            resp_body = ''.join(resp.readlines())
+            if resp and resp.code == 200 and resp_body:
+                return json.loads(resp_body)['origin'] == self.proxy_host.split(':', 2)[0]
+        except Exception as e:
+            logging.warning('Check url(%s) throught proxy(%s) error: %s' % (url, self.opener.handlers[0].proxies, e))
+        return False
+
     """Base class of IP pipeline, use for checking IP"""
     def check_proxy(self):
         """return host is valid or not
         """
+        if not self.check_httpbin():
+            return
         threads = []
         self._before_check()
         for index, url in enumerate(self.url_list):
@@ -130,11 +164,11 @@ def put_set(conn):
                 host = conn.srandmember(set_name, 0)
                 expire_key = build_key([settings.EXPIRE_PRE, host])
                 expire_time = conn.get(expire_key)
-                expire_time = float(expire_time) if expire_time else 0
-                if time.time() - expire_time >= settings.EXPIRE_SECONDS:
+                expire_time = _datetime(expire_time) if expire_time else datetime.datetime.fromtimestamp(0)
+                if datetime.datetime.now() - expire_time >= settings.EXPIRE_DELTA:
                     conn.sadd(settings.HOST_S, host)
                     conn.srem(set_name, host)
-                    logging.debug("Push to %s set with %s" % (set_name, host))
+                    logging.debug("Push from %s set with %s" % (set_name, host))
                 time.sleep(0.2)
         time.sleep(3)
 
@@ -157,7 +191,8 @@ def check_proxy(conn):
             if pc.ret.get('ping', False):
                 conn.sadd(set_name, host)
                 expire_key = build_key([settings.EXPIRE_PRE, host])
-                conn.set(expire_key, time.time()+settings.EXPIRE_SECONDS)
+                conn.set(expire_key, datetime.datetime.now()+settings.EXPIRE_DELTA)
+                logging.debug("Proxy[%s] check successfully in %s" % (pc.proxy_host, set_name))
 
 
 def signal_handler(signal, frame):

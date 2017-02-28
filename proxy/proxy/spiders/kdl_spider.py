@@ -23,8 +23,9 @@ class KDLSpider(scrapy.Spider):
 
     """Get proxy ip from url"""
 
-    def __init__(self):
+    def __init__(self, page=2):
         """"""
+        self.page = int(page)
 
     def parse(self, response):
         """parse crawl page
@@ -36,7 +37,7 @@ class KDLSpider(scrapy.Spider):
         # debug
         # from scrapy.shell import inspect_response
         # inspect_response(response, self)
-        for i in range(1, 2):
+        for i in range(1, self.page):
             yield scrapy.Request(
                 response.request.url + '%s' % (i),
                 self.parse_ip,

@@ -19,7 +19,7 @@ class ProxyMiddleware(HttpProxyMiddleware):
         redis_db = crawler.settings.get('REDIS_DB')
         normal_s = crawler.settings.get('NORMAL_S')
         conn = RedisPool.get_pool(redis_host, redis_port, redis_db)
-        cls.proxy_list = conn.smembers(normal_s)
+        cls.proxy_list = list(conn.smembers(normal_s))
         return cls()
 
     def process_request(self, request, spider):
