@@ -48,7 +48,8 @@ class AmazonSpider(scrapy.Spider):
             item['title'] = safe_list_get(li.xpath('.//h2/@data-attribute').extract(), 0, '')
             if item['title'] == '':
                 continue
-            item['author'] = safe_list_get(li.xpath('.//div[@class="a-row a-spacing-none"]/span/text()').extract(), 0, 'Unknown')
+            item['date'] = safe_list_get(li.xpath('.//div[@class="a-row a-spacing-none"][1]/span/text()').extract(), 0, 'Unknown')
+            item['author'] = safe_list_get(li.xpath('.//div[@class="a-row a-spacing-none"][2]/span/text()').extract(), 0, 'Unknown')
             price = li.xpath('.//span[contains(@class, "s-price")]/text()').extract()
             if len(price) == 0:
                 price = li.xpath('.//span[contains(@class, "a-color-price")]/text()').extract()

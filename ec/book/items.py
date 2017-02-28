@@ -11,6 +11,7 @@ import scrapy
 class BookItem(scrapy.Item):
     # define the fields for your item here like:
     title = scrapy.Field()
+    date = scrapy.Field()
     author = scrapy.Field()
     price = scrapy.Field()
     rating = scrapy.Field()
