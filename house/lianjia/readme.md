@@ -1,3 +1,6 @@
+```
+pip install -r requirements.txt
+```
 ```python
 python get_all_house.py [110000]
 ```
