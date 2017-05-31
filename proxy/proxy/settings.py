@@ -2,7 +2,7 @@ import datetime
 
 
 BOT_NAME = 'proxySpider'
-DOWNLOAD_DELAY = 0.25
+DOWNLOAD_DELAY = 2
 DOWNLOAD_TIMEOUT = 7
 
 RETRY_HTTP_CODES = [400, 500, 502, 503, 521]
