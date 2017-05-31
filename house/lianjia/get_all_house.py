@@ -43,7 +43,7 @@ def save_checkpoint(cir_id):
 
 
 def main():
-    step = 500
+    step = 200
     parser = argparse.ArgumentParser()
     parser.add_argument('city_code', nargs='?', default=110000, type=int, help='city code')
     args = parser.parse_args()

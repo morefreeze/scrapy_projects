@@ -1,6 +1,8 @@
 #!/bin/bash
 dir=${1:-bj}
-for i in ${dir}/*.json; do
+for i in ${dir}/[0-9].json; do
     echo "$i"
-    jq --compact-output --raw-output '.data.list' "$i" | mongoimport -d lianjia -c bj --jsonArray --mode=upsert --upsertFields=house_code
+    while read -r line; do
+        echo "$line" | jq --compact-output --raw-output '.data.list' | mongoimport -d lianjia -c "$dir" --jsonArray --mode=upsert --upsertFields=house_code
+    done < "$i"
 done
