@@ -44,4 +44,10 @@ run_spider = BashOperator(
     dag=dag
 )
 
-only_run_now >> run_spider
+import_db = BashOperator(
+    task_id='import_db',
+    bash_command='cd {dir} && ./import_db.sh "{output_dir}" '.format(dir=dir, output_dir=output_dir),
+    dag=dag,
+)
+
+only_run_now >> run_spider >> import_db
