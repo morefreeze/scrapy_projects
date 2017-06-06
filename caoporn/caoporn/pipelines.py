@@ -33,7 +33,7 @@ class MongoPipeline(object):
         self.client.close()
 
     def process_item(self, item, spider):
-        self.db[self.collection_name].insert(dict(item))
+        self.db[self.collection_name].replace_one({'hash': item['hash']}, dict(item), upsert=True)
         return item
 
 class DuplicatesPipeline(object):
@@ -60,7 +60,10 @@ class DuplicatesPipeline(object):
         self.db = self.client[self.mongo_db]
         # load all mongo item in memory
         for item in self.db[self.collection_name].find():
-            self.item_seen.add(item['hash'])
+            if 'hash' in item:
+                self.item_seen.add(item['hash'])
+            else:
+                print 'item: %s' % item
         print "import mongo %d items" %(len(self.item_seen))
 
     def close_spider(self, spider):

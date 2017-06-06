@@ -17,4 +17,5 @@ class VideoItem(scrapy.Item):
     views = scrapy.Field()
     is_hd = scrapy.Field()
     is_private = scrapy.Field()
+    _create_time = scrapy.Field()
 
