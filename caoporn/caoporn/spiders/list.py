@@ -52,7 +52,7 @@ class ListSpider(scrapy.Spider):
             item['hash'] = vid.xpath('a/@href').re('/video[0-9]*/([0-9a-f]+)/')[0]
             touch_newest = touch_newest or item['hash'] in self.newest_vids
             item['cover'] = response.urljoin(get_default(vid.xpath('a/img/@src').extract(), 0, ''))
-            item['length'] = convert_time_len(get_default(vid.xpath('div[@class="box_left"]/text()').extract(), 0, '00:00').strip())
+            item['length'] = int(convert_time_len(get_default(vid.xpath('div[@class="box_left"]/text()').extract(), 0, '00:00').strip()))
             item['views'] = get_default(vid.xpath('div[@class="box_right"]/text()').re('[0-9]+'), 0, 0)
             item['is_hd'], item['is_private'] = False, False
             for img_src in vid.xpath('img/@src').extract():
