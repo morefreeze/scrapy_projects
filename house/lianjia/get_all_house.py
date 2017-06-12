@@ -14,6 +14,8 @@ from tqdm import tqdm
 bizcircle_url = 'http://ajax.lianjia.com/ajax/mapsearch/area/bizcircle?city_id={code}'
 circle_url = 'http://ajax.lianjia.com/ajax/housesell/area/bizcircle?ids={ids}&limit_offset={cursor}&limit_count={step}&sort=&&city_id={code}'
 ck_file = 'checkpoint'
+STEP_DELAY = 0.5  # seconds
+DELAY = 2  # seconds
 
 
 def wget_lj(url, file=None, dir='./', append=False):
@@ -73,8 +75,8 @@ def main():
             url = circle_url.format(ids=urllib.quote(','.join(cir_ids)), cursor=i, step=step, code=city_code)
             house_list = json.loads(wget_lj(url, file=file, dir=dir, append=True))['data']['list']
             circle_list.extend(house_list)
-            time.sleep(0.2)
-        time.sleep(2)
+            time.sleep(STEP_DELAY)
+        time.sleep(DELAY)
         save_checkpoint(cir_id, dir)
 
 

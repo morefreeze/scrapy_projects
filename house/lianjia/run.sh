@@ -6,6 +6,7 @@ for i in {1..100}; do
     rm -f "bizcircle_${code}.json"
     python get_all_house.py "$code" --output-dir "$dir" && break
     ret=$?
+    echo "return code is $ret"
     sleep 1
 done
-exit "$ret"
+exit $ret
