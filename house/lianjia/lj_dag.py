@@ -1,7 +1,8 @@
 # coding: utf-8
 from os import path
 from airflow import DAG
-from airflow.operators import BashOperator, BranchPythonOperator
+from airflow.operators.bash_operator import BashOperator
+from airflow.operators.python_operator import BranchPythonOperator
 import datetime
 
 
@@ -16,7 +17,7 @@ dir = path.abspath(path.dirname(path.realpath(__file__)))
 default_args = {
     'owner': 'airflow',
     'depends_on_past': False,
-    'start_date': datetime.datetime(2017, 5, 30),
+    'start_date': datetime.datetime(2017, 7, 24),
     'email': ['morefreeze@gmail.com', ],
     'email_on_failure': True,
     'email_on_retry': True,
@@ -28,7 +29,7 @@ default_args = {
     # 'end_date': datetime.datetime(2017, 1, 1),
 }
 
-dag = DAG('lianjia', default_args=default_args, schedule_interval='@daily')
+dag = DAG('lianjia2', default_args=default_args, schedule_interval='@weekly')
 
 
 only_run_now = BranchPythonOperator(

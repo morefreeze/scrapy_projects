@@ -20,13 +20,14 @@ def convert_time_len(tl):
 
 class ListSpider(scrapy.Spider):
     name = "list"
-    allowed_domains = ['caoporn.com', 'caomoo.com']
+    allowed_domains = ['caoporn.com', 'caomoo.com', 'caomee.com', '51.caoxee.com']
     # find from mongo
-    start_url = 'http://101.caomoo.com/videos?page=1'
-    max_page = 1000
+    start_url = 'https://51.caoxee.com/videos?page=1'
+    max_page = 2000
 
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         self.page_cnt = 0
+        self.force = 'force' in kwargs
 
     # checkpoint is always last complete parsing page url, so start with it will
     # repeat parse these items again
@@ -45,15 +46,19 @@ class ListSpider(scrapy.Spider):
 
     def parse_video(self, response):
         touch_newest = False
+        self.page_cnt += 1
         for vid in response.xpath('//div[@class="video_box"]'):
             item = VideoItem()
             item['name'] = get_default(vid.xpath('a/img/@title').extract(), 0, '')
             item['url'] = response.urljoin(get_default(vid.xpath('a/@href').extract(), 0, ''))
             item['hash'] = vid.xpath('a/@href').re('/video[0-9]*/([0-9a-f]+)/')[0]
             touch_newest = touch_newest or item['hash'] in self.newest_vids
+            if not self.force and touch_newest:
+                self.log('touch newest @ %s' % item['hash'])
+                return
             item['cover'] = response.urljoin(get_default(vid.xpath('a/img/@src').extract(), 0, ''))
             item['length'] = int(convert_time_len(get_default(vid.xpath('div[@class="box_left"]/text()').extract(), 0, '00:00').strip()))
-            item['views'] = get_default(vid.xpath('div[@class="box_right"]/text()').re('[0-9]+'), 0, 0)
+            item['views'] = int(get_default(vid.xpath('div[@class="box_right"]/text()').re('[0-9]+'), 0, 0))
             item['is_hd'], item['is_private'] = False, False
             for img_src in vid.xpath('img/@src').extract():
                 item['is_hd'] = item['is_hd'] or 'hd.png' in img_src
@@ -62,7 +67,6 @@ class ListSpider(scrapy.Spider):
             yield item
 
         next_url = response.xpath('//div[@class="pagination"]/ul/li[position()=last()]/a[@class="prevnext"]/@href').extract()
-        if len(next_url) > 0:
-            if self.page_cnt < self.max_page:
-                self.log(next_url[-1])
-                yield scrapy.Request(next_url[-1], callback=self.parse_video)
+        if len(next_url) > 0 and self.page_cnt < self.max_page:
+            self.log('next page is: %s' % next_url[-1])
+            yield scrapy.Request(url=next_url[-1], callback=self.parse_video)

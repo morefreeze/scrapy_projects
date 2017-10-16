@@ -5,7 +5,7 @@ import json
 import os
 import datetime
 import urllib
-import urllib2
+import requests
 import time
 import argparse
 from tqdm import tqdm
@@ -21,7 +21,7 @@ DELAY = 2  # seconds
 def wget_lj(url, file=None, dir='./', append=False):
     ts = int(time.time() * 1000)
     url += '&_={ts}'.format(ts=ts)
-    content = urllib2.urlopen(url, timeout=15).read()
+    content = requests.get(url, timeout=15).content
     if file:
         mode = 'a' if append else 'w'
         with open(os.path.join(dir, file), mode) as f:
