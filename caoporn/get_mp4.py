@@ -49,7 +49,7 @@ def main():
     if args.output_dir:
         map(lambda url: download(url, args.output_dir), filter(lambda x: x != '', true_urls))
     else:
-        map(print, get_mp4(urls))
+        map(print, true_urls)
 
 
 if __name__ == '__main__':
