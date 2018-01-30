@@ -50,12 +50,11 @@ class AmazonSpider(scrapy.Spider):
                 continue
             item['date'] = safe_list_get(li.xpath('.//div[@class="a-row a-spacing-none"][1]/span/text()').extract(), 0, 'Unknown')
             item['author'] = safe_list_get(li.xpath('.//div[@class="a-row a-spacing-none"][2]/span/text()').extract(), 0, 'Unknown')
-            price = li.xpath('.//span[contains(@class, "s-price")]/text()').extract()
-            if len(price) == 0:
-                price = li.xpath('.//span[contains(@class, "a-color-price")]/text()').extract()
-            item['price'] = price[-1] if len(price) > 0 else '-1.0'
-            if len(price) == 0:
-                print '='*20, li, response.url
+            # price = li.xpath('.//span[contains(@class, "s-price")]/text()').extract()
+            # if len(price) == 0:
+            # price = li.xpath('.//span[contains(@class, "a-color-price")]/text()').extract()
+            # item['price'] = price[-1] if len(price) > 0 else '-1.0'
+            item['price'] = ''.join(li.xpath('.//span[contains(@class, "price")]/text()')[-3:].extract())
             item['rating'] = float(safe_list_get(li.xpath('.//i[contains(@class, "a-icon-star")]/span/text()').re('[\d\.]+'), 0, 0.0))
             item['rating_num'] = int(safe_list_get(li.xpath('.//a[contains(@class, "a-size-small")]/text()').re('\d+'), 0, 0))
             item['url'] = safe_list_get(li.xpath('.//a[contains(@class, "s-access-detail-page")]/@href').extract(), 0, '')
