@@ -63,8 +63,8 @@ class DuplicatesPipeline(object):
             if 'hash' in item:
                 self.item_seen.add(item['hash'])
             else:
-                print 'item: %s' % item
-        print "import mongo %d items" %(len(self.item_seen))
+                print('item: %s' % item)
+        print("import mongo %d items" %(len(self.item_seen)))
 
     def close_spider(self, spider):
         """close mongo

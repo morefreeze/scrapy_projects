@@ -20,9 +20,9 @@ def convert_time_len(tl):
 
 class ListSpider(scrapy.Spider):
     name = "list"
-    allowed_domains = ['caoporn.com', 'caomoo.com', 'caomee.com', '51.caoxee.com']
+    allowed_domains = ['caoporn.com', 'caomoo.com', 'caomee.com', '51.caoxee.com', 'cao.vgao.xyz']
     # find from mongo
-    start_url = 'https://51.caoxee.com/videos?page=1'
+    start_url = 'http://cao.vgao.xyz/videos?page=1'
     max_page = 5000
 
     def __init__(self, *args, **kwargs):
