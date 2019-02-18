@@ -1,0 +1,6 @@
+data/
+url/
+*.cookie
+node_modules/
+scrapinghub.yml
+setup.py
