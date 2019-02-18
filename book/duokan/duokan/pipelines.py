@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import pymongo
 from scrapy.exceptions import DropItem
+from duokan.items import BookInfo
 
 # Define your item pipelines here
 #
@@ -33,5 +34,6 @@ class MongoPipeline(object):
         self.client.close()
 
     def process_item(self, item, spider):
-        self.db[self.collection_name].replace_one({'book_id': item['book_id']}, dict(item), upsert=True)
+        if isinstance(item, BookInfo):
+            self.db[self.collection_name].replace_one({'book_id': item['id']}, item['data'], upsert=True)
         return item

@@ -8,7 +8,14 @@
 import scrapy
 
 
-class DuokanItem(scrapy.Item):
+class BookInfo(scrapy.Item):
     # define the fields for your item here like:
     # name = scrapy.Field()
-    pass
+    id = scrapy.Field()
+    data = scrapy.Field()
+
+class IssItem(scrapy.Item):
+    book_id = scrapy.Field()
+    page_id = scrapy.Field()
+    page_num = scrapy.Field()
+    url = scrapy.Field()

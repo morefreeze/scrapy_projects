@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import scrapy
-from book.items import BookItem
+from items import BookItem
 
 
 def safe_list_get(l, idx, default=''):
@@ -26,7 +26,7 @@ class AmazonSpider(scrapy.Spider):
             if url:
                 self.start_url = url
             else:
-                self.start_url = 'https://www.amazon.cn/s/?node=%s&ie=UTF8' % (node)
+                self.start_url = 'https://www.amazon.cn/s/?node=%s' % (node)
 
     def start_requests(self):
         if self.cat and self.start_url:
