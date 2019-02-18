@@ -13,14 +13,10 @@ def get_mp4(url):
     r = requests.get(url)
     content = r.content.decode('utf-8')
     m = re.search(r'textarea name="video_embed_code[^>]+>([^<]+)</textarea>', content)
-    if not m:
-        return ''
     emb_url = m.group(1).strip()
     r = requests.get(emb_url)
     content = r.content.decode('utf-8')
-    m = re.search(r'<source src="([^"]+.mp4[^"]+)"', content)
-    if not m:
-        return ''
+    m = re.search(r'<source src="([^"]+.mp4)"', content)
     mp4_url = m.group(1).strip()
     return mp4_url
 
@@ -44,7 +40,7 @@ def main():
     if args.code:
         urls = []
         for code in args.code:
-            urls.append('https://51.caoxee.com/video/%s' % code)
+            urls.append('https://gao2.cc/video60/%s' % (code))
     else:
         urls = args.url
     true_urls = list(map(get_mp4, urls))
