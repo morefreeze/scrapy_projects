@@ -8,8 +8,9 @@ scrapy = "*"
 selenium = "*"
 ipython = "*"
 pymongo = "*"
+simplejson = "*"
 
 [dev-packages]
 
 [requires]
-python_version = "3.6.5"
+python_version = "3.7"
