@@ -62,6 +62,8 @@ class AmazonSpider(scrapy.Spider):
             yield item
 
         next_page = response.xpath('//li[contains(@class, "a-last")]/a/@href')
+        if not next_page:
+            next_page = response.xpath('//a[@id="pagnNextLink"]/@href')
         self.logger.debug(next_page)
         if next_page:
             url = response.urljoin(next_page[0].extract())
