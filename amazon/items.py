@@ -13,6 +13,7 @@ class BookItem(scrapy.Item):
     title = scrapy.Field()
     date = scrapy.Field()
     author = scrapy.Field()
+    author_date = scrapy.Field()
     price = scrapy.Field()
     rating = scrapy.Field()
     rating_num = scrapy.Field()

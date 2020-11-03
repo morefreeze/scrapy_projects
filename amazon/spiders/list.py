@@ -42,28 +42,35 @@ class AmazonSpider(scrapy.Spider):
         ) for cat, url in self.start_urls.items()]
 
     def parse_book_follow_next_page(self, response):
-        lis = response.xpath('//ul[contains(@class, "s-result-list")]/li')
+        lis = response.xpath('//ul[contains(@class, "s-result-list")]/li') or \
+            response.xpath('//div[contains(@class, "s-result-list")]/div[contains(@class, "s-result-item")]')
         for li in lis:
             item = BookItem()
-            item['title'] = safe_list_get(li.xpath('.//h2/@data-attribute').extract(), 0, '')
+            item['title'] = safe_list_get(li.xpath('.//h2/@data-attribute').extract() or \
+                                          li.xpath('.//h2//span/text()').extract(),
+                                          0, '')
             if item['title'] == '':
                 continue
             item['date'] = safe_list_get(li.xpath('.//div[@class="a-row a-spacing-none"][1]/span/text()').extract(), 0, 'Unknown')
             item['author'] = safe_list_get(li.xpath('.//div[@class="a-row a-spacing-none"][2]/span/text()').extract(), 0, 'Unknown')
+            item['author_date'] = ''.join(li.xpath('.//div[@class="a-row a-size-base a-color-secondary"][1]/span/text()').extract())
             # price = li.xpath('.//span[contains(@class, "s-price")]/text()').extract()
             # if len(price) == 0:
             # price = li.xpath('.//span[contains(@class, "a-color-price")]/text()').extract()
             # item['price'] = price[-1] if len(price) > 0 else '-1.0'
             item['price'] = ''.join(li.xpath('.//span[contains(@class, "price")]/text()')[-3:].extract())
             item['rating'] = float(safe_list_get(li.xpath('.//i[contains(@class, "a-icon-star")]/span/text()').re('[\d\.]+'), 0, 0.0))
-            item['rating_num'] = int(safe_list_get(li.xpath('.//a[contains(@class, "a-size-small")]/text()').re('\d+'), 0, 0))
-            item['url'] = safe_list_get(li.xpath('.//a[contains(@class, "s-access-detail-page")]/@href').extract(), 0, '')
+            item['rating_num'] = int(safe_list_get(li.xpath('.//a[contains(@class, "a-size-small")]/text()').re('\d+') or \
+                                                   li.xpath('.//div[contains(@class,"a-size-small")]/span[2]//span/text()').re('\d+'), 0, 0))
+            item['url'] = safe_list_get(li.xpath('.//a[contains(@class, "s-access-detail-page")]/@href').extract() or \
+                                        li.xpath('.//a[contains(@class, "a-link-normal")]/@href').extract(), 0, '')
+            if self.allowed_domains[0] not in item['url']:
+                item['url'] = self.allowed_domains[0] + item['url']
             item['category'] = response.meta['category']
             yield item
 
-        next_page = response.xpath('//li[contains(@class, "a-last")]/a/@href')
-        if not next_page:
-            next_page = response.xpath('//a[@id="pagnNextLink"]/@href')
+        next_page = response.xpath('//li[contains(@class, "a-last")]/a/@href') or \
+            response.xpath('//a[@id="pagnNextLink"]/@href')
         self.logger.debug(next_page)
         if next_page:
             url = response.urljoin(next_page[0].extract())
