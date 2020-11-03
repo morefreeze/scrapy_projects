@@ -61,7 +61,7 @@ class AmazonSpider(scrapy.Spider):
             item['category'] = response.meta['category']
             yield item
 
-        next_page = response.xpath('//a[@id="pagnNextLink"]/@href')
+        next_page = response.xpath('//li[contains(@class, "a-last")]/a/@href')
         self.logger.debug(next_page)
         if next_page:
             url = response.urljoin(next_page[0].extract())
