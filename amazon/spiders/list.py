@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import datetime
 import scrapy
 from amazon.items import BookItem
 
@@ -21,8 +22,9 @@ class AmazonSpider(scrapy.Spider):
     }
 
     def __init__(self, cat=None, url=None, node=None):
-        if cat and (node or url):
-            self.cat = cat
+        if cat is None:
+            self.cat = datetime.datetime.today().strftime('%Y%m%d')
+        if node or url:
             if url:
                 self.start_url = url
             else:
@@ -35,11 +37,6 @@ class AmazonSpider(scrapy.Spider):
                 meta={'category': self.cat},
                 callback=self.parse_book_follow_next_page
             )]
-        return [scrapy.Request(
-            url,
-            meta={'category': cat},
-            callback=self.parse_book_follow_next_page
-        ) for cat, url in self.start_urls.items()]
 
     def parse_book_follow_next_page(self, response):
         lis = response.xpath('//ul[contains(@class, "s-result-list")]/li') or \
